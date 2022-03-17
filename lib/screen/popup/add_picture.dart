@@ -445,7 +445,7 @@ class AddPictureState extends State<AddPicture> {
             return Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('Envoie des photos', style: GoogleFonts.getFont( 'Lato', fontWeight: FontWeight.bold, fontSize: 20)),
+                Text('Envoi des photos', style: GoogleFonts.getFont( 'Lato', fontWeight: FontWeight.bold, fontSize: 20)),
                 Padding(padding: const EdgeInsetsDirectional.fromSTEB(0, 15, 0, 15), child: LinearPercentIndicator(percent: sendingPercentage, progressColor: Colors.green)),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(primary: Colors.redAccent),

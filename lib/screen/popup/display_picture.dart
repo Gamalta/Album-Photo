@@ -110,7 +110,7 @@ class DisplayPictureState extends State<DisplayPicture> {
             children: [
               Row(
                 children: [
-                  Text("tags:   ", style: GoogleFonts.getFont('Lato', color: Colors.white, fontSize: 15)),
+                  Text(picture.getTags().length > 1 ? "tags:   " : "tag:   ", style: GoogleFonts.getFont('Lato', color: Colors.white, fontSize: 15)),
                   IconButton(
                     padding: const EdgeInsetsDirectional.all(0), 
                     constraints: const BoxConstraints(), 
@@ -130,7 +130,7 @@ class DisplayPictureState extends State<DisplayPicture> {
             children: [
               RichText(
                 text: TextSpan(
-                  text: 'Ajouté le: ',
+                  text: 'Photographié le: ',
                   style: GoogleFonts.getFont('Lato', color: Colors.white, fontSize: 15),
                   children: [
                     TextSpan(

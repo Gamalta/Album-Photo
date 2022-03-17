@@ -145,7 +145,7 @@ class Api {
       
       int i = 0;
       for (var picture in pictures) {
-        archive.addFile(ArchiveFile("image $i.png", picture.getImage().lengthInBytes, picture.getImage()));
+        archive.addFile(ArchiveFile("image $i.jpg", picture.getImage().lengthInBytes, picture.getImage()));
         i++;
       }
 
@@ -153,7 +153,7 @@ class Api {
       
     } else {
 
-      label = "image.png";
+      label = "image.jpg";
       base64 = pictures[0].getImage();
     }
 

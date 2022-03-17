@@ -47,7 +47,7 @@ class HomeState extends State<Home> with SingleTickerProviderStateMixin {
       drawer: Filter(widget.callback, pictures),
       appBar: AppBar(
         backgroundColor: Colors.blue,
-        title: const Text("Album photo"),
+        title: const Text("Album photos"),
         leading: Builder(
           builder: (BuildContext context) {
             return IconButton(
@@ -74,7 +74,7 @@ class HomeState extends State<Home> with SingleTickerProviderStateMixin {
             }
           ),
           Center(
-            child: Text("selection d'image" + (selectedPictures.isNotEmpty ? ": ${selectedPictures.length}" : ""))
+            child: Text(selectedPictures.length > 1 ? "sélection d'images" : "sélection d'image" + (selectedPictures.isNotEmpty ? ": ${selectedPictures.length}" : ""))
           ),
           Container(width: 20),
           IconButton(
