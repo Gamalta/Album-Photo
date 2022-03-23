@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:lr_bike_life/main.dart';
 import 'package:lr_bike_life/screen/popup/display_picture.dart';
-import 'package:lr_bike_life/screen/widget/filter.dart';
+import 'package:lr_bike_life/screen/widget/filter_drawer.dart';
+import 'package:lr_bike_life/utils/filter.dart';
 import 'package:lr_bike_life/utils/picture.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lr_bike_life/utils/pre_picture.dart';
+import 'package:lr_bike_life/utils/tag.dart';
+import 'package:lr_bike_life/utils/user.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
 class Home extends StatefulWidget {
@@ -19,14 +23,16 @@ class HomeState extends State<Home> with SingleTickerProviderStateMixin {
 
   late ScrollController scrollController = ScrollController();
   static late HomeState instance;
-  List<dynamic> picturesId = [];
+  Filter filter = Filter(<Tag>[], <int>[], <User>[]);
+  List<PrePicture> prePictures = [];
+  List<PrePicture> filtedprePictures = [];
   List<Picture> pictures = [];
   List<Picture> selectedPictures = [];
   bool selectionMode = false;
   StateSetter? stateSetter;
   double sendingPercentage = 0;
   int picturesSize = 0;
-  int displayedSize = 30;
+  int displayedSize = 0;
   double padding = 20;
   int overImage = 0;
   bool loading = false;
@@ -35,16 +41,16 @@ class HomeState extends State<Home> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
     instance = this;
-    picturesId.clear();
-    pictures.clear();
+    scrollController.addListener(() => {
+      loadMorePictures(false),
+    });
     initAllPictures();
-    scrollController.addListener(() => loadMorePictures());
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: Filter(widget.callback, pictures),
+      drawer: FilterDrawer(widget.callback, prePictures, filter),
       appBar: AppBar(
         backgroundColor: Colors.blue,
         title: const Text("Album photos"),
@@ -78,13 +84,13 @@ class HomeState extends State<Home> with SingleTickerProviderStateMixin {
           ),
           Container(width: 20),
           IconButton(
-            onPressed: () => giveSelectedPictures(), 
+            onPressed: () => selectedPictures.isNotEmpty ? giveSelectedPictures() : {}, 
             icon: const Icon(Icons.download), 
             mouseCursor: selectedPictures.isEmpty ? SystemMouseCursors.forbidden : SystemMouseCursors.click,
             color: selectedPictures.isEmpty ? Colors.grey : Colors.black
           ),
           IconButton(
-            onPressed: () => removeSelectedPictures(),
+            onPressed: () => selectedPictures.isNotEmpty ? removeSelectedPictures() : {},
             icon: const Icon(Icons.delete_outline),
             mouseCursor: selectedPictures.isEmpty ? SystemMouseCursors.forbidden : SystemMouseCursors.click,
             color: selectedPictures.isEmpty ? Colors.grey : Colors.black
@@ -104,6 +110,7 @@ class HomeState extends State<Home> with SingleTickerProviderStateMixin {
                 child: Column(
                   children: [
                     GridView.count(
+                      physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
                       crossAxisSpacing: 1,
                       mainAxisSpacing: 1,
@@ -120,28 +127,28 @@ class HomeState extends State<Home> with SingleTickerProviderStateMixin {
     );
   }
 
-  void initAllPictures() async {  
+  void initAllPictures() async {
     debugPrint("initing...");
-    picturesId = (await App.api.getPicturesArray({}))["pictures"];
-    picturesSize = picturesId.length;
-
-    if(picturesId.isNotEmpty){
-      await for(dynamic uuid in Stream.fromIterable(picturesId.take(displayedSize))){
-        Picture picture = await App.api.getMiniature(uuid['uuid'].toString());
-
-        setState(() {
-          pictures.add(picture);
-        });
-      }
-    }
+    prePictures.clear();
+    filtedprePictures.clear();
+    pictures.clear();
+    prePictures = await App.api.getPicturesArray();
+    filtedprePictures = prePictures.toList();
+    picturesSize = prePictures.length;
+    loadMorePictures(true);
   }
 
-  void loadMorePictures() async {
-    if(picturesId.length >= displayedSize && scrollController.position.maxScrollExtent <= scrollController.offset && !loading){
-      loading = true;
-      await for(dynamic uuid in Stream.fromIterable(picturesId.skip(displayedSize).take(30))){
-        Picture picture = await App.api.getMiniature(uuid['uuid'].toString());
+  void resetPictures(){
+    pictures.clear();
+    displayedSize = 0;
+    loadMorePictures(true);    
+  }
 
+  void loadMorePictures(force) async {
+    if(force || (filtedprePictures.length >= displayedSize && scrollController.position.maxScrollExtent <= scrollController.offset && !loading)){
+      loading = true;
+      await for(PrePicture prePicture in Stream.fromIterable(filtedprePictures.skip(displayedSize).take(30))){
+        Picture picture = await App.api.getMiniature(prePicture.getKey());
         setState(() {
           pictures.add(picture);
         });
@@ -268,12 +275,6 @@ class HomeState extends State<Home> with SingleTickerProviderStateMixin {
   void removePicture(String uuid){
     setState(() {
       pictures.removeWhere((element) => element.getKey() == uuid);
-    });
-  }
-
-  void addPicture(Picture picture){
-    setState(() {
-      picturesId.add({"uuid": picture.getKey()});
     });
   }
 }

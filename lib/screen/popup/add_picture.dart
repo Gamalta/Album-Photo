@@ -394,7 +394,7 @@ class AddPictureState extends State<AddPicture> {
       setState(() {
 
         for (Uint8List image in selectedImages) { 
-          Picture picture = Picture(const Uuid().v4(), image, [], DateTime.now().millisecondsSinceEpoch, index, App.getUser(App.getAccount().getUniqueId()));
+          Picture picture = Picture(const Uuid().v4(), image, <Tag>[], DateTime.now().millisecondsSinceEpoch, index, App.getUser(App.getAccount().getUniqueId()));
           prePicture![index] = picture;
           index++;
         }
@@ -420,8 +420,7 @@ class AddPictureState extends State<AddPicture> {
           break;
         }
 
-        await App.api.sendImage(await picture.toJson());
-        HomeState.instance.addPicture(picture);
+        await App.api.sendImage(picture.toJson());
         index++;
 
         setStater!(() {
@@ -430,8 +429,6 @@ class AddPictureState extends State<AddPicture> {
       }
       Navigator.of(context).pop();
       Navigator.of(context).pop();
-      HomeState.instance.picturesId.clear();
-      HomeState.instance.pictures.clear();
       HomeState.instance.initAllPictures();
     }
   }

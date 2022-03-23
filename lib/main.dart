@@ -52,10 +52,12 @@ class App extends StatelessWidget {
   }
 
   static initAPI(String username, String password){
+    debugPrint("initing API...");
     api = Api(username, password);
   }
 
   static initTags() async {
+    debugPrint("initing Tags...");
     _tags.clear();
     _tags = await api.getTags();
   }
@@ -77,6 +79,7 @@ class App extends StatelessWidget {
   }
 
   static initUsers() async {
+    debugPrint("initing Users...");
     _users.clear();
     _users = await api.getUsers();
   }

@@ -4,6 +4,7 @@ import 'dart:html';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:lr_bike_life/utils/picture.dart';
+import 'package:lr_bike_life/utils/pre_picture.dart';
 import 'package:lr_bike_life/utils/tag.dart';
 import 'package:lr_bike_life/utils/user.dart';
 import 'dart:convert';
@@ -39,7 +40,7 @@ class Api {
       jsonObject = jsonDecode(response.body);
     
     } catch (e){
-      debugPrint("usersss error: " + e.toString());
+      debugPrint("users error: " + e.toString());
     }
 
     for(Map<String, dynamic> json in jsonObject['users']){
@@ -57,7 +58,7 @@ class Api {
 
     try {
 
-      Uri uri = Uri.http('save.redblock.fr', '/api/tags');
+      Uri uri = Uri.https('save.redblock.fr', '/api/tags');
       http.Response response = await http.get(uri, headers: headers);
       jsonObject = jsonDecode(response.body);
 
@@ -75,8 +76,7 @@ class Api {
 
   Future<Picture> getMiniature(String uuid) async {
 
-    Picture picture = Picture(uuid, Uint8List(0), [], 0, -1, User("id", "name"));
-
+    Picture picture = Picture(uuid, Uint8List(0), <Tag>[], 0, -1, User("id", "name"));
     try {
       
       Uri uri = Uri.https('save.redblock.fr', '/api/pictures', {"uuid": "ico:" + uuid});
@@ -84,14 +84,15 @@ class Api {
       picture = Picture.fromJson(jsonDecode(response.body));
 
     } catch(e) {
-      debugPrint("error: " + e.toString());
+      debugPrint("minature error: " + e.toString());
     }
+
     return picture;
   }
 
   Future<Picture> getPicture(String uuid) async {
 
-    Picture picture = Picture(uuid, Uint8List(0), [], 0, -1, User("id", "name"));
+    Picture picture = Picture(uuid, Uint8List(0), <Tag>[], 0, -1, User("id", "name"));
 
     try {
 
@@ -100,25 +101,26 @@ class Api {
       picture = Picture.fromJson(jsonDecode(response.body));
     
     } catch(e) {
-      debugPrint("error: " + e.toString());
+      debugPrint("picture error: " + e.toString());
     }
     return picture;
   }
 
-  Future<Map<String, dynamic>> getPicturesArray(Map<String, dynamic> parameters) async {
+  Future<List<PrePicture>> getPicturesArray() async {
 
-    Map<String, dynamic> jsonObject = {};
-
+    List<PrePicture> prePictures = [];
     try {
 
-      Uri uri = Uri.https('save.redblock.fr', '/api/pictures', parameters);
-      http.Response response = await http.get(uri, headers: headers);        
-      jsonObject = jsonDecode(response.body);
-
+      Uri uri = Uri.https('save.redblock.fr', '/api/pictures');
+      http.Response response = await http.get(uri, headers: headers);
+      for(dynamic json in jsonDecode(response.body)['pictures']){
+        PrePicture prePicture = PrePicture.fromJson(json);
+        prePictures.add(prePicture);
+      }
     } catch (e) {
-        debugPrint("error: " + e.toString());
+        debugPrint("array error: " + e.toString());
     }
-    return jsonObject;
+    return prePictures;
   }
 
   Future sendImage(Map<String, dynamic> json) async {
@@ -129,7 +131,7 @@ class Api {
       await http.post(uri, body: json.toString(), headers: headers);
 
     } catch (e) {
-        debugPrint("error: " + e.toString());
+        debugPrint("send error: " + e.toString());
     }
   }
 
@@ -172,7 +174,7 @@ class Api {
         await http.delete(uri, headers: headers);
       } catch (e) {
         
-          debugPrint("error: " + e.toString());
+          debugPrint("delete error: " + e.toString());
       }
     }
     

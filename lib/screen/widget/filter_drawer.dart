@@ -1,30 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:lr_bike_life/main.dart';
-import 'package:lr_bike_life/utils/picture.dart';
+import 'package:lr_bike_life/screen/tab/home.dart';
+import 'package:lr_bike_life/utils/filter.dart';
+import 'package:lr_bike_life/utils/pre_picture.dart';
 import 'package:lr_bike_life/utils/user.dart';
 
-class Filter extends StatefulWidget {
+// ignore: must_be_immutable
+class FilterDrawer extends StatefulWidget {
 
-  const Filter(this.callback, this.pictures, {Key? key}) : super(key: key);
+  FilterDrawer(this.callback, this.pictures, this.filter, {Key? key}) : super(key: key);
+  final Filter filter;
   final Function callback;
-  final List<Picture> pictures;
+  List<PrePicture> pictures;
 
   @override
-  FilterState createState() => FilterState();
+  FilterDrawerState createState() => FilterDrawerState();
 }
 
-class FilterState extends State<Filter> {
+class FilterDrawerState extends State<FilterDrawer> {
 
-  List<Picture> filtedPictures = [];
   bool tag = false;
   bool date = false;
-  List<User> authors = [];
   bool author = false;
 
   @override
-  void initState() {
-    super.initState();
-    filtedPictures = widget.pictures.toList();
+  void dispose() {
+    super.dispose();
+    HomeState.instance.filter = widget.filter;
+    HomeState.instance.filtedprePictures = widget.pictures.toList();
+
+
+    for(PrePicture picture in widget.pictures){
+      if(widget.filter.getUsers().isNotEmpty && !widget.filter.getUsers().contains(picture.getAuthor())){
+        for(PrePicture filtedPrePicture in HomeState.instance.filtedprePictures){
+          if(filtedPrePicture.getKey() == picture.getKey()){
+            HomeState.instance.filtedprePictures.remove(filtedPrePicture);
+          }
+        }
+      }
+    }
+    
+    HomeState.instance.resetPictures();
   }
 
   @override
@@ -72,7 +88,7 @@ class FilterState extends State<Filter> {
                 date ? Container(height: 100, color: Colors.blue): Container(),
                 ListTile(
                   leading: const Icon(Icons.person, color: Colors.white),
-                  title: Text((authors.isNotEmpty && authors.length > 1 ? "photographes" : "photographe") + (authors.isNotEmpty ? " ${authors.length}" : ""), style: const TextStyle(color: Colors.white)),
+                  title: Text((widget.filter.getUsers().isNotEmpty && widget.filter.getUsers().length > 1 ? "photographes" : "photographe") + (widget.filter.getUsers().isNotEmpty ? " ${widget.filter.getUsers().length}" : ""), style: const TextStyle(color: Colors.white)),
                   trailing: getIcon(author),
                   onTap: () => {
                     setState(() {
@@ -96,16 +112,14 @@ class FilterState extends State<Filter> {
   Widget getAuthor(){
 
     List<Widget> children = [];
-    List<Picture> authorPictures = filtedPictures.toList();
     int index = 0;
 
     for(User user in App.getUsers().values){
       int pictureSize = 0;
 
-      for(Picture picture in authorPictures.toList()){
+      for(PrePicture picture in widget.pictures){
         if(user == picture.getAuthor()){
           pictureSize++;
-          authorPictures.remove(picture);
         }
       }
 
@@ -114,13 +128,13 @@ class FilterState extends State<Filter> {
         child: GestureDetector(
           onTap: () => {
             if(pictureSize != 0){
-              setState(() => authors.contains(user) ? authors.remove(user) : authors.add(user))
+              setState(() => widget.filter.getUsers().contains(user) ? widget.filter.getUsers().remove(user) : widget.filter.getUsers().add(user))
             }
           },
           child: Container(
             height: 50,
             decoration: BoxDecoration(
-              color: authors.contains(user) ? Colors.grey[600] : Colors.grey[700],
+              color: widget.filter.getUsers().contains(user) ? Colors.grey[600] : Colors.grey[700],
               border: index == 0 ? const Border() : const Border(top: BorderSide(color: Colors.black))
             ),
             padding: const EdgeInsets.all(10),
@@ -136,8 +150,8 @@ class FilterState extends State<Filter> {
                 ),
                 pictureSize != 0 ? Checkbox(
                   activeColor: Colors.blue,
-                  value: authors.contains(user),
-                  onChanged: (value) => setState(() => authors.contains(user) ? authors.remove(user) : authors.add(user))
+                  value: widget.filter.getUsers().contains(user),
+                  onChanged: (value) => setState(() => widget.filter.getUsers().contains(user) ? widget.filter.getUsers().remove(user) : widget.filter.getUsers().add(user))
                 ) : Container()
               ]
             )

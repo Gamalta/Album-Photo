@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lr_bike_life/main.dart';
 import 'package:lr_bike_life/screen/tab/home.dart';
 import 'package:lr_bike_life/utils/picture.dart';
 import 'package:intl/intl.dart';
 import 'package:lr_bike_life/utils/tag.dart';
-
-import '../../main.dart';
 
 class DisplayPicture extends StatefulWidget {
   
