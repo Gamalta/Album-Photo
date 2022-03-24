@@ -3,6 +3,7 @@ import 'package:lr_bike_life/main.dart';
 import 'package:lr_bike_life/screen/tab/home.dart';
 import 'package:lr_bike_life/utils/filter.dart';
 import 'package:lr_bike_life/utils/pre_picture.dart';
+import 'package:lr_bike_life/utils/tag.dart';
 import 'package:lr_bike_life/utils/user.dart';
 
 // ignore: must_be_immutable
@@ -22,24 +23,20 @@ class FilterDrawerState extends State<FilterDrawer> {
   bool tag = false;
   bool date = false;
   bool author = false;
+  List<PrePicture> newPrePictures = [];
+
+  @override
+  void initState() {
+    super.initState();
+    newPrePictures = widget.pictures.toList();    
+  }
 
   @override
   void dispose() {
     super.dispose();
     HomeState.instance.filter = widget.filter;
-    HomeState.instance.filtedprePictures = widget.pictures.toList();
-
-
-    for(PrePicture picture in widget.pictures){
-      if(widget.filter.getUsers().isNotEmpty && !widget.filter.getUsers().contains(picture.getAuthor())){
-        for(PrePicture filtedPrePicture in HomeState.instance.filtedprePictures){
-          if(filtedPrePicture.getKey() == picture.getKey()){
-            HomeState.instance.filtedprePictures.remove(filtedPrePicture);
-          }
-        }
-      }
-    }
-    
+    purge(true, true, true);
+    HomeState.instance.filtedprePictures = newPrePictures;
     HomeState.instance.resetPictures();
   }
 
@@ -66,7 +63,7 @@ class FilterDrawerState extends State<FilterDrawer> {
               children: [
                 ListTile(
                   leading: const Icon(Icons.tag, color: Colors.white),
-                  title: const Text('tag', style: TextStyle(color: Colors.white)),
+                  title: Text((widget.filter.getTags().length > 1 ? "Tags " : "Tag ") + (widget.filter.getTags().isNotEmpty ? widget.filter.getTags().length.toString() : ""), style: const TextStyle(color: Colors.white)),
                   trailing: getIcon(tag),
                   onTap: () => {
                     setState(() {
@@ -74,7 +71,7 @@ class FilterDrawerState extends State<FilterDrawer> {
                     })
                   }
                 ),
-                tag ? Container(height: 100, color: Colors.red): Container(),
+                tag ? getTag() : Container(),
                 ListTile(
                   leading: const Icon(Icons.date_range, color: Colors.white),
                   title: const Text('date', style: TextStyle(color: Colors.white)),
@@ -88,7 +85,7 @@ class FilterDrawerState extends State<FilterDrawer> {
                 date ? Container(height: 100, color: Colors.blue): Container(),
                 ListTile(
                   leading: const Icon(Icons.person, color: Colors.white),
-                  title: Text((widget.filter.getUsers().isNotEmpty && widget.filter.getUsers().length > 1 ? "photographes" : "photographe") + (widget.filter.getUsers().isNotEmpty ? " ${widget.filter.getUsers().length}" : ""), style: const TextStyle(color: Colors.white)),
+                  title: Text((widget.filter.getUsers().length > 1 ? "photographes " : "photographe ") + (widget.filter.getUsers().isNotEmpty ? widget.filter.getUsers().length.toString() : ""), style: const TextStyle(color: Colors.white)),
                   trailing: getIcon(author),
                   onTap: () => {
                     setState(() {
@@ -105,19 +102,41 @@ class FilterDrawerState extends State<FilterDrawer> {
     );
   }
 
+  void purge(bool t, bool d, bool a){
+    newPrePictures = widget.pictures.toList();  
+    for(PrePicture picture in newPrePictures.toList()){
+
+      if(t && widget.filter.getTags().isNotEmpty){
+        bool removing = true;
+        for(Tag tag in picture.getTags()){
+          if(widget.filter.getTags().contains(tag)){
+            removing = false;
+            break;
+          }
+        }
+        if(removing){
+          newPrePictures.remove(picture);
+        }
+      }
+      if(a && (widget.filter.getUsers().isNotEmpty && !widget.filter.getUsers().contains(picture.getAuthor()))){
+        newPrePictures.remove(picture);
+      }
+    }
+  }
+
   Widget getIcon(bool boo){
     return boo ? const Icon(Icons.expand_less, color: Colors.white) : const Icon(Icons.expand_more, color: Colors.white);
   }
 
   Widget getAuthor(){
-
+    purge(true, true, false);
     List<Widget> children = [];
     int index = 0;
 
     for(User user in App.getUsers().values){
       int pictureSize = 0;
 
-      for(PrePicture picture in widget.pictures){
+      for(PrePicture picture in newPrePictures){
         if(user == picture.getAuthor()){
           pictureSize++;
         }
@@ -128,7 +147,10 @@ class FilterDrawerState extends State<FilterDrawer> {
         child: GestureDetector(
           onTap: () => {
             if(pictureSize != 0){
-              setState(() => widget.filter.getUsers().contains(user) ? widget.filter.getUsers().remove(user) : widget.filter.getUsers().add(user))
+              setState(() => {
+                widget.filter.getUsers().contains(user) ? widget.filter.getUsers().remove(user) : widget.filter.getUsers().add(user),
+                purge(true, true, false)
+              })
             }
           },
           child: Container(
@@ -151,7 +173,76 @@ class FilterDrawerState extends State<FilterDrawer> {
                 pictureSize != 0 ? Checkbox(
                   activeColor: Colors.blue,
                   value: widget.filter.getUsers().contains(user),
-                  onChanged: (value) => setState(() => widget.filter.getUsers().contains(user) ? widget.filter.getUsers().remove(user) : widget.filter.getUsers().add(user))
+                  onChanged: (value) => setState(() => {
+                    widget.filter.getUsers().contains(user) ? widget.filter.getUsers().remove(user) : widget.filter.getUsers().add(user),
+                    purge(true, true, false)
+                  })
+                ) : Container()
+              ]
+            )
+          )
+        )
+      ));
+      index++;
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: children,
+    );
+  }
+
+  Widget getTag(){
+    purge(false, true, true);
+    List<Widget> children = [];
+    int index = 0;
+
+    for(Tag tag in App.getTags().values){
+      int pictureSize = 0;
+
+      for(PrePicture picture in newPrePictures){  
+        if(picture.getTags().contains(tag)){
+          pictureSize++;
+        }
+      }
+
+      children.add(MouseRegion(
+        cursor: pictureSize == 0 ? SystemMouseCursors.forbidden : SystemMouseCursors.click, 
+        child: GestureDetector(
+          onTap: () => {
+            if(pictureSize != 0){
+              setState(() => {
+                widget.filter.getTags().contains(tag) ? widget.filter.getTags().remove(tag) : widget.filter.getTags().add(tag),
+                purge(false, true, true)
+              })
+            }
+          },
+          child: Container(
+            height: 50,
+            decoration: BoxDecoration(
+              color: widget.filter.getTags().contains(tag) ? Colors.grey[600] : Colors.grey[700],
+              border: index == 0 ? const Border() : const Border(top: BorderSide(color: Colors.black))
+            ),
+            padding: const EdgeInsets.all(10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                //user profil picture
+                Row(
+                  children: [
+                    Container(height: 15, width: 15, decoration: BoxDecoration(shape: BoxShape.circle, color: tag.getColor())),
+                    Container(width: 10),
+                    Text(tag.getName(), style: const TextStyle(color: Colors.white)),
+                    Text(" ($pictureSize)", style: TextStyle(color: Colors.grey[400]))
+                  ],
+                ),
+                pictureSize != 0 ? Checkbox(
+                  activeColor: Colors.blue,
+                  value: widget.filter.getTags().contains(tag),
+                  onChanged: (value) => setState(() => {
+                    widget.filter.getTags().contains(tag) ? widget.filter.getTags().remove(tag) : widget.filter.getTags().add(tag),
+                    purge(false, true, true)
+                  })
                 ) : Container()
               ]
             )
