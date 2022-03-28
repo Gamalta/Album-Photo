@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:lr_bike_life/main.dart';
 import 'package:lr_bike_life/screen/tab/home.dart';
+import 'package:lr_bike_life/screen/widget/date_picker.dart';
 import 'package:lr_bike_life/utils/filter.dart';
 import 'package:lr_bike_life/utils/pre_picture.dart';
 import 'package:lr_bike_life/utils/tag.dart';
 import 'package:lr_bike_life/utils/user.dart';
+import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 // ignore: must_be_immutable
 class FilterDrawer extends StatefulWidget {
@@ -82,7 +84,7 @@ class FilterDrawerState extends State<FilterDrawer> {
                     })
                   }
                 ),
-                date ? Container(height: 100, color: Colors.blue): Container(),
+                date ? getDate() : Container(),
                 ListTile(
                   leading: const Icon(Icons.person, color: Colors.white),
                   title: Text((widget.filter.getUsers().length > 1 ? "photographes " : "photographe ") + (widget.filter.getUsers().isNotEmpty ? widget.filter.getUsers().length.toString() : ""), style: const TextStyle(color: Colors.white)),
@@ -255,6 +257,67 @@ class FilterDrawerState extends State<FilterDrawer> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: children,
+    );
+  }
+
+  Widget getDate(){
+
+    DateRangePickerController dateRangePickerController = DateRangePickerController();
+
+    return Container(
+      color: Colors.grey[700],
+      child: DatePicker(),
+      /*child: SfDateRangePicker(
+        controller: dateRangePickerController,
+        //initialSelectedDate: DateTime.fromMillisecondsSinceEpoch(prePicture![selectedPicture]!.getTimesTamp()),
+        //initialDisplayDate: DateTime.fromMillisecondsSinceEpoch(prePicture![selectedPicture]!.getTimesTamp()),
+        todayHighlightColor: Colors.blue,
+        selectionColor: Colors.blue,
+        showNavigationArrow: true,
+        //onSelectionChanged: _onSelectionChanged,
+        maxDate: DateTime.now(),
+        cellBuilder: (BuildContext context, DateRangePickerCellDetails cellDetails) {
+          switch(dateRangePickerController.view){
+            case DateRangePickerView.month:
+              return Container(
+                decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.red),
+                width: cellDetails.bounds.width,
+                height: cellDetails.bounds.height,
+                alignment: Alignment.center,
+                child: Text(cellDetails.date.day.toString()),
+              );
+            case DateRangePickerView.year:
+              return Container(
+                decoration: const BoxDecoration(shape: BoxShape.circle),
+                width: cellDetails.bounds.width,
+                height: cellDetails.bounds.height,
+                alignment: Alignment.center,
+                child: Text(DateFormat('MMM', 'FR').format(cellDetails.date)),
+              );
+            case DateRangePickerView.decade:
+              return Container(
+                decoration: const BoxDecoration(shape: BoxShape.circle),
+                width: cellDetails.bounds.width,
+                height: cellDetails.bounds.height,
+                alignment: Alignment.center,
+                child: Text(cellDetails.date.year.toString()),
+              );
+            case DateRangePickerView.century:
+              final int yearValue = (cellDetails.date.year ~/ 10) * 10;
+              return Container(
+                decoration: const BoxDecoration(shape: BoxShape.circle),
+                width: cellDetails.bounds.width,
+                height: cellDetails.bounds.height,
+                alignment: Alignment.center,
+                child: Text(
+                  yearValue.toString() + ' - ' + (yearValue + 9).toString()),
+              );
+            default:
+            return Container();
+          }
+         },
+        monthViewSettings: const DateRangePickerMonthViewSettings(firstDayOfWeek: 1)
+      )*/
     );
   }
 }
