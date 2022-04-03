@@ -38,8 +38,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   google_fonts: ^2.2.0
   crypt: ^4.0.1
-  # image_picker: ^0.8.4+5                   #android and ios support
-  image_picker_web: ^2.1.0                   #web support
+  image_picker_web: ^2.1.0 
   syncfusion_flutter_datepicker: ^19.4.48
   shared_preferences: ^2.0.12
   percent_indicator: ^4.0.0

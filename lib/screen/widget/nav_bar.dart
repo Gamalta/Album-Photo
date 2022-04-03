@@ -61,7 +61,7 @@ class NavBarWidget extends AnimatedWidget {
 
     final Map icons =  {
       0: NavBarItem(IconButton(icon: const Icon(Icons.image, color: Colors.white), onPressed: () {setHome(); NavBar.lastIndex = widget.currentIndex;}), "Photo", Colors.orange, labelStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.normal)),
-      1: NavBarItem(IconButton(icon: const Icon(Icons.slideshow, color: Colors.white), onPressed: () {}, mouseCursor: SystemMouseCursors.forbidden), "Vidéo", Colors.blue, labelStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.normal)),
+      1: NavBarItem(const IconButton(icon: Icon(Icons.slideshow, color: Colors.white), onPressed: null), "Vidéo", Colors.blue, labelStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.normal)),
       3: NavBarItem(IconButton(icon: const Icon(Icons.person, color: Colors.white), onPressed: () {setProfile(); NavBar.lastIndex = widget.currentIndex;}), "Profil", Colors.blue, labelStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.normal)),
       4: NavBarItem(IconButton(icon: const Icon(Icons.settings, color: Colors.white), onPressed: () {setSettings(); NavBar.lastIndex = widget.currentIndex;}), "Paramètre", Colors.grey, labelStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.normal)),
     };

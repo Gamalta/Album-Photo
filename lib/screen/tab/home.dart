@@ -84,15 +84,13 @@ class HomeState extends State<Home> with SingleTickerProviderStateMixin {
           ),
           Container(width: 20),
           IconButton(
-            onPressed: () => selectedPictures.isNotEmpty ? giveSelectedPictures() : {}, 
-            icon: const Icon(Icons.download), 
-            mouseCursor: selectedPictures.isEmpty ? SystemMouseCursors.forbidden : SystemMouseCursors.click,
+            onPressed: selectedPictures.isNotEmpty ? () => giveSelectedPictures() : null, 
+            icon: const Icon(Icons.download),
             color: selectedPictures.isEmpty ? Colors.grey : Colors.black
           ),
           IconButton(
-            onPressed: () => selectedPictures.isNotEmpty ? removeSelectedPictures() : {},
+            onPressed: selectedPictures.isNotEmpty ? () => removeSelectedPictures() : null,
             icon: const Icon(Icons.delete_outline),
-            mouseCursor: selectedPictures.isEmpty ? SystemMouseCursors.forbidden : SystemMouseCursors.click,
             color: selectedPictures.isEmpty ? Colors.grey : Colors.black
             )
         ],

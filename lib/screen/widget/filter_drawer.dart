@@ -6,7 +6,6 @@ import 'package:lr_bike_life/utils/filter.dart';
 import 'package:lr_bike_life/utils/pre_picture.dart';
 import 'package:lr_bike_life/utils/tag.dart';
 import 'package:lr_bike_life/utils/user.dart';
-import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 // ignore: must_be_immutable
 class FilterDrawer extends StatefulWidget {
@@ -229,9 +228,9 @@ class FilterDrawerState extends State<FilterDrawer> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                //user profil picture
                 Row(
                   children: [
+                    //user profil picture
                     Container(height: 15, width: 15, decoration: BoxDecoration(shape: BoxShape.circle, color: tag.getColor())),
                     Container(width: 10),
                     Text(tag.getName(), style: const TextStyle(color: Colors.white)),
@@ -262,7 +261,7 @@ class FilterDrawerState extends State<FilterDrawer> {
 
   Widget getDate(){
 
-    DateRangePickerController dateRangePickerController = DateRangePickerController();
+    //DateRangePickerController dateRangePickerController = DateRangePickerController();
 
     return Container(
       color: Colors.grey[700],
