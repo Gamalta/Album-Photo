@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class DatePicker extends StatelessWidget {
+
   DatePicker({Key? key, minDate, maxDate, dateType}) : super(key: key);
   DateTime minDate = DateTime(2000);
   DateTime maxDate = DateTime.now();
@@ -10,11 +11,26 @@ class DatePicker extends StatelessWidget {
   int year = 2000;
   String header = "mois";
 
+  List<String> months = [
+    'Janvier',
+    'Février',
+    'Mars',
+    'Avril',
+    'Mai',
+    'Juin',
+    'Juillet',
+    'Août',
+    'Septembre',
+    'Octobre',
+    'Novembre',
+    'Decembre'
+  ]; 
+
   @override
   Widget build(BuildContext context) {
     int crossAxisCount = 0;
     List<Widget> childrens = [];
-    int i = 1;
+    int i = 0;
 
     switch (dateType) {
       case DateDisplayType.day:
@@ -22,9 +38,9 @@ class DatePicker extends StatelessWidget {
         break;
       case DateDisplayType.month:
         crossAxisCount = 4;
-        for (i; i <= 12; i++) {
+        for (i; i < 12; i++) {
           DateFormat month = DateFormat();
-          childrens.add(Center(child: Text("$i")));
+          childrens.add(Center(child: Text(months[i])));
         }
         break;
       case DateDisplayType.year:
@@ -52,20 +68,26 @@ class DatePicker extends StatelessWidget {
             )
           ],
         ),
-        Column(children: [
-          GridView.count(
-            physics: const NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            crossAxisSpacing: 1,
-            mainAxisSpacing: 1,
-            crossAxisCount: crossAxisCount,
-            children: childrens,
-          )
-        ]),
-        Container(color: Colors.blue, child: const Text("content"))
+        Column(
+          children: [
+            GridView.count(
+              physics: const NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              crossAxisSpacing: 1,
+              mainAxisSpacing: 1,
+              crossAxisCount: crossAxisCount,
+              children: childrens,
+            )
+          ]
+        )
       ],
     );
   }
 }
 
-enum DateDisplayType { day, month, year }
+enum DateDisplayType {
+
+  day, 
+  month, 
+  year 
+}
